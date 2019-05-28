@@ -1,0 +1,40 @@
+upstream gardener-gunicorn {
+    server                  127.0.0.1:8000 fail_timeout=0;
+}
+
+upstream gardener-tornado {
+    server                  127.0.0.1:8888;
+}
+
+server {
+    listen                  80 default_server;
+    server_name             _;
+    server_tokens           off;
+
+    location /media {
+        alias               /home/gardener/gardener/gardener/media;
+        expires             1w;
+    }
+
+    location /static {
+        alias               /home/gardener/gardener/gardener/public;
+        expires             1w;
+    }
+
+    location /ws/ {
+        proxy_http_version  1.1;
+        proxy_pass          http://gardener-tornado/;
+        proxy_set_header    Connection "upgrade";
+        proxy_set_header    Upgrade $http_upgrade;
+        proxy_set_header    X-Real-IP $remote_addr;
+        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location / {
+        proxy_pass          http://gardener-gunicorn;
+        proxy_set_header    Host $http_host;
+        proxy_set_header    X-Real-IP $remote_addr;
+        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_redirect      off;
+    }
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en-US">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gardener</title>
+<style>
+@font-face {
+    font-family: 'Oxygen Mono';
+    font-style: normal;
+    font-weight: 400;
+    src:
+        local('Oxygen Mono'),
+        local('OxygenMono-Regular'),
+        url("{% static 'dashboard/fonts/oxygen-mono-v5-latin-regular.woff2' %}") format('woff2'),
+        url("{% static 'dashboard/fonts/oxygen-mono-v5-latin-regular.woff' %}") format('woff');
+}
+</style>
+<link href="{% static 'dashboard/css/normalize.css' %}" rel="stylesheet">
+<link href="{% static 'dashboard/css/dashboard.css' %}" rel="stylesheet">
+</head>
+<body>
+{% block body %}
+{% spaceless %}
+<div class="navbar">
+    <div><h3><a href="{% url 'dashboard' %}">Gardener</a></h3></div>
+    <div><span class="label">Public IP: </span><span id="public-ip">{{ device.public_ip }}</span></div>
+    <div><span class="label">CPU temp: </span><span id="cpu-temp">{{ device.cpu_temp }}</span>°C</div>
+    <div>
+        <span class="label">Pump status: </span>
+        <span id="pump-status">
+            {% for id, status in device.pump_status %}
+                <span id="pump-{{ id }}" data-status="{{ status }}"></span>
+            {% endfor %}
+        </span>
+    </div>
+</div>
+{% endspaceless %}
+{% endblock %}
+<footer><div><p>&copy; {% now 'Y' %} conservator@conservatory.me</p></div></footer>
+{% block js %}
+<script>
+var ws;
+var wsTimer;
+var wsAttempts = 1;
+var publicIP = document.getElementById("public-ip");
+var cpuTemp = document.getElementById("cpu-temp");
+var pumpStatus = document.getElementById("pump-status");
+
+function connect(url) {
+    console.log("connecting to " + url);
+    ws = new WebSocket(url);
+    ws.onopen = onopen;
+    ws.onclose = onclose;
+    ws.onmessage = onmessage;
+    wsTimer = null;
+}
+
+function onopen() {
+    console.log("connected to " + ws.url);
+    wsAttempts = 1;
+}
+
+function onclose(event) {
+    console.log("disconnected from " + ws.url);
+    if (!wsTimer) {
+        var interval = generateInterval(wsAttempts);
+        console.log("reconnecting in " + Math.floor(interval) + " ms");
+        wsTimer = setTimeout(function() {
+            wsAttempts++;
+            connect(ws.url);
+        }, interval);
+    }
+}
+
+function generateInterval(k) {
+    var maxInterval = (Math.pow(2, k) - 1) * 1000;
+    if (maxInterval > 30 * 1000)
+        maxInterval = 30 * 1000;
+    return Math.random() * maxInterval;
+}
+
+function onmessage(event) {
+    console.log("received data " + event.data);
+    var data = JSON.parse(event.data);
+    if ("pump_id" in data) {
+        var span = document.getElementById("pump-" + data.pump_id);
+        span.dataset.status = data.pump_status;
+    } else if ("device_id" in data) {
+        publicIP.innerHTML = data.public_ip;
+        cpuTemp.innerHTML = data.cpu_temp;
+        console.log(data.pump_status);
+        pumpStatus.innerHTML = '';
+        for (var i = 0; i < data.pump_status.length; i++) {
+            var span = document.createElement('span');
+            span.id = "pump-" + data.pump_status[i][0];
+            span.dataset.status = data.pump_status[i][1];
+            pumpStatus.appendChild(span);
+        }
+    }
+}
+
+connect("{{ websocket_url }}");
+</script>
+{% endblock %}
+</body>
+</html>

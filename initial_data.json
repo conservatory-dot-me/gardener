@@ -1,0 +1,108 @@
+[
+    {
+    "model": "data.weatherforecastprovider",
+    "pk": 1,
+    "fields": {
+        "created_time": "2018-09-01T00:00:00Z",
+        "updated_time": "2018-09-01T00:00:00Z",
+        "name": "bom.gov.au",
+        "url": "ftp://ftp.bom.gov.au/anon/gen/fwo/IDN11060.xml"
+    }
+},
+{
+    "model": "data.location",
+    "pk": 1,
+    "fields": {
+        "name": "Sydney Olympic Park",
+        "weather_forecast_provider": 1
+    }
+},
+{
+    "model": "device.device",
+    "pk": 1,
+    "fields": {
+        "created_time": "2018-09-01T00:00:00Z",
+        "updated_time": "2018-09-01T00:00:00Z",
+        "name": "ODROID-C2",
+        "is_active": true,
+        "location": 1,
+        "latitude": -33.8468332,
+        "longitude": 151.0635537
+    }
+},
+{
+    "model": "device.pump",
+    "pk": 1,
+    "fields": {
+        "device": 1,
+        "gpio_export_num": 229,
+        "is_active": true,
+        "max_duration": 600,
+        "scheduled_run_default_duration": 5.0,
+        "scheduled_run_frequency": 0.125
+    }
+},
+{
+    "model": "device.poptopumpduration",
+    "pk": 1,
+    "fields": {
+        "pump": 1,
+        "pop": 90,
+        "duration": 5.0
+    }
+},
+{
+    "model": "device.poptopumpduration",
+    "pk": 2,
+    "fields": {
+        "pump": 1,
+        "pop": 60,
+        "duration": 5.0
+    }
+},
+{
+    "model": "device.poptopumpduration",
+    "pk": 3,
+    "fields": {
+        "pump": 1,
+        "pop": 30,
+        "duration": 5.0
+    }
+},
+{
+    "model": "device.lcd",
+    "pk": 1,
+    "fields": {
+        "device": 1,
+        "pump": 1,
+        "sw1_gpio_export_num": 233,
+        "sw2_gpio_export_num": 231,
+        "led_gpio_export_nums": "[\"228\", \"219\", \"234\", \"214\", \"225\", \"224\", \"218\"]",
+        "is_active": true
+    }
+},
+{
+    "model": "device.camera",
+    "pk": 1,
+    "fields": {
+        "device": 1,
+        "is_active": true,
+        "index": 0,
+        "snapshot_extension": "jpg",
+        "snapshot_duration": 0,
+        "current_snapshot": 0,
+        "max_snapshots": 50000
+    }
+},
+{
+    "model": "device.light",
+    "pk": 1,
+    "fields": {
+        "device": 1,
+        "gpio_export_num": 230,
+        "is_active": true,
+        "start_time": "06:00:00",
+        "duration": 43200.0
+    }
+}
+]

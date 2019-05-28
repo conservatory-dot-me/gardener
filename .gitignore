@@ -1,0 +1,9 @@
+*.pid
+.env
+.idea
+.pytest_cache
+nginx.conf
+__pycache__
+media
+public
+venv

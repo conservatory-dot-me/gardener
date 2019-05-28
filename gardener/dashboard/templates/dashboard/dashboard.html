@@ -1,0 +1,263 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block body %}
+{{ block.super }}
+{% spaceless %}
+<div class="header">
+    <div>
+        <table id="device">
+            <tr>
+                <th>Device</th>
+                <td>{{ device.name }}{% if not device.is_active %} (inactive){% endif %}</td>
+            </tr>
+            <tr>
+                <th>Location</th>
+                <td>{{ device.location.name }}</td>
+            </tr>
+            <tr>
+                <th>Local time</th>
+                <td>{{ device.local_time|date:"r" }}</td>
+            </tr>
+            <tr>
+                <th>Next sunrise</th>
+                <td>{{ device.next_sunrise|date:"r" }}</td>
+            </tr>
+            <tr>
+                <th>Next sunset</th>
+                <td>{{ device.next_sunset|date:"r" }}</td>
+            </tr>
+            {% if device.snapshots %}
+                <tr>
+                    <th colspan="2">Snapshots ({{ device.snapshots|length }})</th>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="snapshots">
+                            {% for snapshot in device.snapshots|slice:":100" %}
+                                <span class="snapshot">
+                                    <img src="{{ snapshot.url }}">
+                                    <span class="label">{{ snapshot.dt|date:"c" }}</span>
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
+        </table>
+    </div>
+    <div id="pumps">
+        {% for pump in device.pump_set.all %}
+            <table class="pump">
+                <tr>
+                    <th>#{{ pump.gpio_export_num }}</th>
+                    <td>
+                        <form action="{% url 'start-pump' pump_id=pump.id %}" method="post">{% csrf_token %}
+                            <input type="submit" class="btn btn-start" value="Start"{% if not pump.is_active or not pump.device.is_active %} disabled="disabled"{% endif %}>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{% url 'stop-pump' pump_id=pump.id %}" method="post">{% csrf_token %}
+                            <input type="submit" class="btn btn-stop" value="Stop">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+</div>
+
+{% if next_scheduled_run %}
+<div class="run">
+    <div class="field">Next scheduled run</div>
+    <div class="field">{{ next_scheduled_run.pump.name }}</div>
+    <div class="field">{{ next_scheduled_run.start_time|date:"r" }}</div>
+    <div class="duration">
+        <div class="duration-bar" style="width: {% widthratio next_scheduled_run.duration next_scheduled_run.pump.max_duration 100 %}%;"><p>{{ next_scheduled_run.duration|floatformat:"0" }}s</p></div>
+    </div>
+</div>
+{% endif %}
+
+{% if last_scheduled_run %}
+<div class="run">
+    <div class="field">Last scheduled run</div>
+    <div class="field">{{ last_scheduled_run.pump.name }}</div>
+    <div class="field">{{ last_scheduled_run.start_time|date:"r" }}</div>
+    <div class="duration">
+        <div class="duration-bar" style="width: {% widthratio last_scheduled_run.scheduled_run.duration last_scheduled_run.pump.max_duration 100 %}%;"><p>{{ last_scheduled_run.scheduled_run.duration|floatformat:"0" }}s</p></div>
+    </div>
+</div>
+{% endif %}
+
+<div id="weather-chart-container" data-url="{% url 'weather-forecasts' device_id=device.id %}"></div>
+{% endspaceless %}
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'dashboard/js/js.cookie.js' %}"></script>
+<script src="{% static 'dashboard/js/highcharts/highcharts.js' %}"></script>
+<script src="{% static 'dashboard/js/highcharts/highcharts-more.js' %}"></script>
+<script>
+document.getElementById("pumps").addEventListener("submit", function(event) {
+    if (event.target && event.target.matches("form")) {
+        event.preventDefault();
+        var url = event.target.getAttribute("action");
+        var xhr = new XMLHttpRequest();
+        var csrftoken = Cookies.get("csrftoken");
+        xhr.open("POST", url, true);
+        xhr.onload = function () {
+            if (xhr.status == 200) {
+                console.log("responseText = " + xhr.responseText);
+            } else {
+                console.error("xhr.status = " + xhr.status);
+            }
+        };
+        xhr.onerror = function () {
+            console.error("connection error");
+        };
+        xhr.setRequestHeader("x-csrftoken", csrftoken);
+        xhr.send();
+    }
+});
+
+loadWeatherChart(document.getElementById("weather-chart-container"));
+
+function loadWeatherChart(chart) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", chart.dataset.url, true);
+    xhr.onload = function () {
+        if (xhr.status == 200) {
+            var data = JSON.parse(xhr.responseText);
+            if (data.length > 0) {
+                chart.style.display = "block";
+                populateWeatherChart(chart, data);
+            }
+        } else {
+            console.error("xhr.status = " + xhr.status);
+        }
+    };
+    xhr.onerror = function () {
+        console.error("connection error");
+    };
+    xhr.send();
+}
+
+function populateWeatherChart(chart, data) {
+    var tempData = [];
+    var popData = [];
+    var dataLength = data.length;
+    var tempUnit = '';
+    for (var i = 0; i < dataLength; i++) {
+        if (i === 0) {
+            tempUnit = data[i][1];
+        }
+        tempData.push([
+            data[i][0] * 1000,  // Start time
+            data[i][2],  // Min. temp
+            data[i][3]  // Max. temp
+        ]);
+        popData.push([
+            data[i][0] * 1000,  // Start time
+            data[i][4]  // POP
+        ]);
+    }
+
+    Highcharts.setOptions({
+        time: {useUTC: false}
+    });
+
+    Highcharts.chart(chart.id, {
+        chart: {
+            backgroundColor: "#1f1f1f",
+            style: {fontFamily: "'Oxygen Mono', monospace"}
+        },
+        title: {text: null},
+        legend: {enabled: false},
+        credits: {enabled: false},
+        plotOptions: {
+            areasplinerange: {
+                color: "#66ff66",
+                enableMouseTracking: false,
+                dataLabels: {
+                    enabled: true,
+                    format: "{y}" + tempUnit,
+                    style: {
+                        fontSize: "10px",
+                        color: "#66ff66",
+                        textOutline: "none"
+                    }
+                }
+            },
+            spline: {
+                color: "#67e6ec",
+                enableMouseTracking: false,
+                dataLabels: {
+                    enabled: true,
+                    format: "{y}%",
+                    style: {
+                        fontSize: "10px",
+                        color: "#67e6ec",
+                        textOutline: "none"
+                    }
+                }
+            },
+            series: {
+                animation: false
+            }
+        },
+        xAxis: {
+            gridLineWidth: 1,
+            gridLineColor: "#2f2f2f",
+            lineColor: "#2f2f2f",
+            tickColor: "#2f2f2f",
+            type: "datetime",
+            labels: {
+                format: "{value:%a, %b %e}",
+                style: {
+                    fontSize: "10px",
+                    color: "#ccdfcc"
+                }
+            }
+        },
+        yAxis: [{
+            gridLineWidth: 0,
+            title: {text: null},
+            labels: {enabled: false}
+        }, {
+            gridLineWidth: 0,
+            title: {text: null},
+            labels: {enabled: false},
+            opposite: true
+        }],
+        tooltip: {
+            crosshairs: true,
+            shared: true,
+        },
+        series: [{
+            type: "areasplinerange",
+            name: "Temperature",
+            yAxis: 0,
+            data: tempData,
+            marker: {
+                radius: 2,
+                symbol: "circle"
+            },
+            tooltip: {valueSuffix: tempUnit},
+            fillOpacity: 0.1
+        }, {
+            type: "spline",
+            name: "POP",
+            yAxis: 1,
+            data: popData,
+            lineWidth: 1,
+            marker: {
+                radius: 2,
+                symbol: "circle"
+            },
+            tooltip: {valueSuffix: "%"}
+        }]
+    });
+}
+</script>
+{% endblock %}

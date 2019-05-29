@@ -95,8 +95,11 @@ then
     cd ${base_dir}
 fi
 
-echo "Installing crontab"
-crontab crontab.txt
+if [ ${hostname} = "gardener" ]
+then
+    echo "Installing crontab"
+    crontab crontab.txt
+fi
 
 echo ""
 echo "*** READY ***"

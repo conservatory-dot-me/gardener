@@ -59,7 +59,12 @@ class Command(BaseCommand):
                         date=last_start_time + timedelta(days=freq - 1))
                     next_start_time = next_sunrise
                 else:
-                    next_start_time = last_start_time + timedelta(seconds=freq * 86400)
+                    while True:
+                        next_start_time = last_start_time + timedelta(seconds=freq * 86400)
+                        if next_start_time <= timezone.now():
+                            last_start_time = next_start_time
+                        else:
+                            break
 
                 # Get forecast nearest to next_start_time.
                 min_forecast_time = next_start_time - timedelta(hours=24)

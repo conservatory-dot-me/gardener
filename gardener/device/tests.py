@@ -72,7 +72,7 @@ class DeviceTestCase(TransactionTestCase):
         timezone,
         'now',
         return_value=datetime.strptime('2018-09-08T10:32:05+1000', '%Y-%m-%dT%H:%M:%S%z'))
-    def test_schedule_run(self, *args):
+    def test_schedule_run_1(self, *args):
         PopToPumpDuration.objects.create(pump=self.pump_1, pop=30, duration=240)
         PopToPumpDuration.objects.create(pump=self.pump_1, pop=60, duration=180)
         PopToPumpDuration.objects.create(pump=self.pump_1, pop=90, duration=120)
@@ -86,9 +86,9 @@ class DeviceTestCase(TransactionTestCase):
             pop=50)
 
         call_command('schedule_run', run_once=True)
+        self.assertEqual(ScheduledRun.objects.count(), 2)
 
         next_sunrise, next_sunset = get_next_sun(self.lat, self.lon)
-        self.assertEqual(ScheduledRun.objects.count(), 2)
 
         scheduled_run = ScheduledRun.objects.first()
         self.assertEqual(scheduled_run.pump.gpio_export_num, self.pump_1.gpio_export_num)
@@ -96,10 +96,24 @@ class DeviceTestCase(TransactionTestCase):
         self.assertIsNotNone(scheduled_run.weather_forecast)
         self.assertEqual(scheduled_run.duration, 180)
 
+    @mock.patch.object(
+        timezone,
+        'now',
+        return_value=datetime.strptime('2019-05-29T17:00:00+1000', '%Y-%m-%dT%H:%M:%S%z'))
+    def test_schedule_run_2(self, *args):
+        ScheduledRun.objects.create(
+            pump=self.pump_2,
+            start_time=datetime.strptime('2019-05-29T13:00:00+1000', '%Y-%m-%dT%H:%M:%S%z'),
+            duration=self.pump_2.scheduled_run_default_duration)
+
+        call_command('schedule_run', run_once=True)
+        self.assertEqual(ScheduledRun.objects.count(), 3)
+
         scheduled_run = ScheduledRun.objects.last()
+
         self.assertEqual(scheduled_run.pump.gpio_export_num, self.pump_2.gpio_export_num)
-        self.assertEqual((scheduled_run.start_time - timezone.now()).total_seconds(), 8875)
-        self.assertIsNotNone(scheduled_run.weather_forecast)
+        self.assertEqual((scheduled_run.start_time - timezone.now()).total_seconds(), 7200.0)
+        self.assertIsNone(scheduled_run.weather_forecast)
         self.assertEqual(scheduled_run.duration, 60)
 
     @mock.patch.object(

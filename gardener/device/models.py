@@ -118,8 +118,8 @@ class Device(models.Model):
         return snapshots
 
 
-class Gpio(object):
-    # GPIO values.
+class Gpio(models.Model):
+    # GPIO values (swapped during get/set when using active-low relay).
     OFF = 0
     ON = 1
 
@@ -132,10 +132,25 @@ class Gpio(object):
     FALLING = 'falling'
     BOTH = 'both'
 
+    # Relay types.
+    ACTIVE_HIGH = 1
+    ACTIVE_LOW = 0
+
+    relay_type = models.PositiveSmallIntegerField(default=ACTIVE_HIGH)
+
+    class Meta:
+        abstract = True
+
     def gpio_value(self, gpio_export_num):
         path = f'/sys/class/gpio/gpio{gpio_export_num}/value'
         if os.path.isfile(path):
             value = int(open(path).read().strip())
+            assert value in (self.ON, self.OFF)
+            if self.relay_type == self.ACTIVE_LOW:
+                if value == 1:
+                    return 0
+                else:
+                    return 1
             return value
         return 0
 
@@ -178,6 +193,11 @@ class Gpio(object):
 
         if value is not None:
             if os.path.isfile(gpio_value_path):
+                if self.relay_type == self.ACTIVE_LOW:
+                    if value == 1:
+                        value = 0
+                    else:
+                        value = 1
                 logger.debug(f'echo {value} > {gpio_value_path}')
                 for _ in range(3):
                     while True:
@@ -209,7 +229,7 @@ class Gpio(object):
                 logger.warning(f'path does not exist - gpio_edge_path={gpio_edge_path}')
 
 
-class Pump(models.Model, Gpio):
+class Pump(Gpio):
     MAX_DURATION = 600
 
     TIMED_OUT = 2  # Ran over duration.
@@ -376,7 +396,7 @@ class Run(models.Model):
         return str(self)
 
 
-class Lcd(models.Model, Gpio):
+class Lcd(Gpio):
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
     pump = models.ForeignKey(Pump, blank=True, null=True, on_delete=models.CASCADE)
     sw1_gpio_export_num = models.PositiveSmallIntegerField(
@@ -489,7 +509,7 @@ class Camera(models.Model):
         return os.path.join(settings.MEDIA_URL, 'snapshots', str(self.device.id), str(self.id))
 
 
-class Light(models.Model, Gpio):
+class Light(Gpio):
     device = models.ForeignKey(Device, on_delete=models.CASCADE)
     gpio_export_num = models.PositiveSmallIntegerField(help_text='GPIO export number connected to this light.')
     is_active = models.BooleanField(default=True)

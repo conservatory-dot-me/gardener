@@ -34,6 +34,7 @@
     "model": "device.pump",
     "pk": 1,
     "fields": {
+        "relay_type": 0,
         "device": 1,
         "gpio_export_num": 229,
         "is_active": true,
@@ -98,6 +99,7 @@
     "model": "device.light",
     "pk": 1,
     "fields": {
+        "relay_type": 0,
         "device": 1,
         "gpio_export_num": 230,
         "is_active": true,

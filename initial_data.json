@@ -39,7 +39,7 @@
         "gpio_export_num": 229,
         "is_active": true,
         "max_duration": 600,
-        "scheduled_run_default_duration": 5.0,
+        "scheduled_run_default_duration": 2.0,
         "scheduled_run_frequency": 0.125
     }
 },
@@ -49,7 +49,7 @@
     "fields": {
         "pump": 1,
         "pop": 90,
-        "duration": 5.0
+        "duration": 2.0
     }
 },
 {
@@ -58,7 +58,7 @@
     "fields": {
         "pump": 1,
         "pop": 60,
-        "duration": 5.0
+        "duration": 2.0
     }
 },
 {
@@ -67,7 +67,7 @@
     "fields": {
         "pump": 1,
         "pop": 30,
-        "duration": 5.0
+        "duration": 2.0
     }
 },
 {

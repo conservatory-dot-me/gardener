@@ -20,6 +20,7 @@ class PumpInline(admin.TabularInline):
         'max_duration',
         'scheduled_run_default_duration',
         'scheduled_run_frequency',
+        'scheduled_run_email_notification_recipients',
     )
 
 
@@ -85,6 +86,7 @@ class PumpAdmin(admin.ModelAdmin):
         'max_duration',
         'scheduled_run_default_duration',
         'scheduled_run_frequency',
+        'scheduled_run_email_notification_recipients',
     )
     inlines = (
         PopToPumpDurationInline,

@@ -45,6 +45,7 @@ class Command(BaseCommand):
                     continue
                 subject = f'Scheduled run started - Run #{run.id}'
                 message = f'Pump {run.pump.name} has started running for {scheduled_run.duration}s'
+                recipients = scheduled_run.pump.scheduled_run_email_notification_recipients
                 weather_forecast = scheduled_run.weather_forecast
                 if weather_forecast:
                     message += (
@@ -53,7 +54,8 @@ class Command(BaseCommand):
                         f'Min. temp: {weather_forecast.min_temp}{weather_forecast.temp_unit}\n'
                         f'Max. temp: {weather_forecast.max_temp}{weather_forecast.temp_unit}\n'
                         f'POP: {weather_forecast.pop}')
-                send_email_notification(subject, message)
+                if recipients:
+                    send_email_notification(subject, message, recipients)
 
             if run_once:
                 break

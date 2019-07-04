@@ -257,6 +257,7 @@ class Pump(Gpio):
         default=SCHEDULED_RUN_DEFAULT_DURATION, help_text='Default scheduled runtime duration in seconds.')
     scheduled_run_frequency = models.FloatField(
         blank=True, null=True, choices=SCHEDULED_RUN_FREQUENCY_CHOICES, default=DAILY)
+    scheduled_run_email_notification_recipients = ArrayField(models.EmailField(), blank=True, null=True)
 
     def __str__(self):
         return '<%s device=%s gpio_export_num=%d>' % (self.__class__.__name__, self.device, self.gpio_export_num)

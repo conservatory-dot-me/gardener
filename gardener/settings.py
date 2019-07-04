@@ -20,7 +20,6 @@ EMAIL_CONFIG = env.email_url('EMAIL_URL')
 vars().update(EMAIL_CONFIG)
 EMAIL_SUBJECT_PREFIX = '[Gardener] '
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='gardener@localhost')
-EMAIL_NOTIFICATION_RECIPIENTS = env.list('EMAIL_NOTIFICATION_RECIPIENTS', default=[])
 
 INTERNAL_IPS = env.list('INTERNAL_IPS', default=[])
 

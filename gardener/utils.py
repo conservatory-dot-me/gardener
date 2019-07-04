@@ -190,10 +190,10 @@ def time_in_range(start_time, end_time, now):
         return now >= start_time or now <= end_time
 
 
-def send_email_notification(subject, message):
+def send_email_notification(subject, message, recipients):
     subject = f'{settings.EMAIL_SUBJECT_PREFIX}{subject}'
     datatuple = []
-    for recipient in settings.EMAIL_NOTIFICATION_RECIPIENTS:
+    for recipient in recipients:
         datatuple.append((subject, message, None, (recipient, )))
     if datatuple:
         EmailThread(datatuple).start()

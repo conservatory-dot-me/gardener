@@ -522,3 +522,13 @@ class Light(Gpio):
 
     def __repr__(self):
         return str(self)
+
+    def start(self):
+        if self.gpio_value(self.gpio_export_num) != self.ON:
+            logger.info(f'starting light={self}')
+            self.set_gpio_value(self.gpio_export_num, self.ON)
+
+    def stop(self):
+        if self.gpio_value(self.gpio_export_num) != self.OFF:
+            logger.info(f'stopping light={self}')
+            self.set_gpio_value(self.gpio_export_num, self.OFF)

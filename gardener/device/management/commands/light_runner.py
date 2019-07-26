@@ -34,6 +34,10 @@ class Command(BaseCommand):
         delay = options['delay']
 
         while True:
+            lights = Light.objects.filter(is_active=False)
+            for light in lights:
+                light.stop()
+
             lights = Light.objects.filter(device__is_active=True, is_active=True)
             for light in lights:
                 now = timezone.localtime().time()
@@ -42,13 +46,9 @@ class Command(BaseCommand):
                 end_time = (start_dt + timedelta(seconds=light.duration)).time()
 
                 if time_in_range(start_time, end_time, now):
-                    if light.gpio_value(light.gpio_export_num) != Light.ON:
-                        logger.info(f'starting light={light}')
-                        light.set_gpio_value(light.gpio_export_num, Light.ON)
+                    light.start()
                 else:
-                    if light.gpio_value(light.gpio_export_num) != Light.OFF:
-                        logger.info(f'stopping light={light}')
-                        light.set_gpio_value(light.gpio_export_num, Light.OFF)
+                    light.stop()
 
             if run_once:
                 break

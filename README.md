@@ -1,6 +1,6 @@
 # Gardener
 
-Gardener is an automated plant watering system powered by single board computer (SBC) with dashboard built using Django web framework.
+Gardener is an automated plant watering, lighting and monitoring system powered by single board computer (SBC) with dashboard built using Django web framework.
 
 ![Desktop screenshot](gardener/dashboard/static/dashboard/img/screenshot-desktop.png?raw=true "Desktop screenshot")
 
@@ -14,9 +14,9 @@ work. If not, see <http://creativecommons.org/licenses/by-nc/4.0/>.
 
 ## Features
 
-- Automatic hourly/3-hourly/daily/weekly/monthly watering schedule with watering duration based on local weather forecast.
+- Automatic hourly, 3-hourly, daily, weekly or monthly watering schedule with watering duration based on local weather forecast.
 
-- Start time for daily/weekly/monthly scheduled watering is set based on time of local sunrise.
+- Start time for daily, weekly or monthly scheduled watering is set based on time of local sunrise.
 
 - Take photos periodically to visually monitor plant growth.
 
@@ -24,7 +24,7 @@ work. If not, see <http://creativecommons.org/licenses/by-nc/4.0/>.
 
 - Optionally receive an email notification when scheduled watering is started.
 
-- Manually start/stop pump from web-based user interface or tactile switches on device.
+- Manually start or stop water pump from web-based user interface or tactile switches on device.
 
 - LED indicator on device to monitor current expected precipitation.
 

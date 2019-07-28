@@ -256,7 +256,7 @@ class Pump(Gpio):
     scheduled_run_default_duration = models.FloatField(
         default=SCHEDULED_RUN_DEFAULT_DURATION, help_text='Default scheduled runtime duration in seconds.')
     scheduled_run_frequency = models.FloatField(
-        blank=True, null=True, choices=SCHEDULED_RUN_FREQUENCY_CHOICES, default=DAILY)
+        blank=True, null=True, choices=SCHEDULED_RUN_FREQUENCY_CHOICES, default=DAILY, help_text='In days.')
     scheduled_run_email_notification_recipients = ArrayField(models.EmailField(), blank=True, null=True)
 
     def __str__(self):
@@ -494,6 +494,7 @@ class Camera(models.Model):
     index = models.PositiveSmallIntegerField(default=0, help_text='Camera index passed to cv2.')
 
     snapshot_extension = models.CharField(max_length=3, default='jpg')
+    snapshot_frequency = models.PositiveIntegerField(default=3600, help_text='In seconds.')
     snapshot_duration = models.PositiveIntegerField(default=0)
     current_snapshot = models.PositiveIntegerField(default=0)
     max_snapshots = models.PositiveIntegerField(default=100)

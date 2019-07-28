@@ -90,6 +90,7 @@
         "is_active": true,
         "index": 0,
         "snapshot_extension": "jpg",
+        "snapshot_frequency": 3600,
         "snapshot_duration": 0,
         "current_snapshot": 0,
         "max_snapshots": 50000

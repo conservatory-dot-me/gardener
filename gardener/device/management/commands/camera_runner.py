@@ -27,7 +27,7 @@ class Command(BaseCommand):
             camera = Camera.objects.filter(device__is_active=True, is_active=True).first()
             if camera:
                 capture(camera)
-                delay = max(0, default_delay - camera.snapshot_duration)
+                delay = max(0, camera.snapshot_frequency - camera.snapshot_duration)
             else:
                 delay = default_delay
             logger.debug(f'sleeping for {delay}s')

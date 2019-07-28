@@ -18,19 +18,19 @@ work. If not, see <http://creativecommons.org/licenses/by-nc/4.0/>.
 
 - Start time for daily/weekly/monthly scheduled watering is set based on time of local sunrise.
 
-- Receive an email notification when scheduled watering is started.
+- Take photos periodically to visually monitor plant growth.
 
-- Option to manually start/stop pump from web-based user interface.
+- Automatic daily lighting schedule with adjustable duration.
 
-- Option to manually start/stop pump from tactile switches on device.
+- Optionally receive an email notification when scheduled watering is started.
+
+- Manually start/stop pump from web-based user interface or tactile switches on device.
 
 - LED indicator on device to monitor current expected precipitation.
 
 - 16x2 LCD on device to show its current private and public IP for web access.
 
-- Option to remotely operate the pumps from anywhere in the world on your computer or mobile device.
-
-- Automatic daily lighting schedule with adjustable lighting duration.
+- Remotely operate the pumps from anywhere in the world on your computer or mobile device.
 
 - Web-based admin interface.
 
@@ -124,7 +124,7 @@ passwd -dl root
 Run the commands below to setup the system. Manual instructions are shown in angle brackets e.g. `<Instruction here>`.
 
 ```
-apt -y update && apt -y upgrade && apt -y dist-upgrade && apt -y autoremove && apt -y clean && apt -y update
+apt -y update && apt -y upgrade && apt -y dist-upgrade && apt purge modemmanager && apt -y autoremove && apt -y clean && apt -y update
 
 sed -i 's/#LoginGraceTime 2m/LoginGraceTime 3/g' /etc/ssh/sshd_config
 sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config

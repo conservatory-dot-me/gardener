@@ -24,6 +24,21 @@ class PumpInline(admin.TabularInline):
     )
 
 
+class CameraInline(admin.TabularInline):
+    model = Camera
+    extra = 0
+
+    fields = (
+        'is_active',
+        'index',
+        'snapshot_extension',
+        'snapshot_frequency',
+        'snapshot_duration',
+        'current_snapshot',
+        'max_snapshots',
+    )
+
+
 class LightInline(admin.TabularInline):
     model = Light
     extra = 1
@@ -74,6 +89,7 @@ class DeviceAdmin(admin.ModelAdmin):
     )
     inlines = (
         PumpInline,
+        CameraInline,
         LightInline,
     )
 
@@ -145,6 +161,7 @@ class CameraAdmin(admin.ModelAdmin):
         'is_active',
         'index',
         'snapshot_extension',
+        'snapshot_frequency',
         'snapshot_duration',
         'current_snapshot',
         'max_snapshots',

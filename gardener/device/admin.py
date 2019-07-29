@@ -13,7 +13,6 @@ from gardener.device.models import ScheduledRun
 class PumpInline(admin.TabularInline):
     model = Pump
     extra = 1
-
     fields = (
         'gpio_export_num',
         'is_active',
@@ -27,10 +26,11 @@ class PumpInline(admin.TabularInline):
 class CameraInline(admin.TabularInline):
     model = Camera
     extra = 0
-
     fields = (
         'is_active',
         'index',
+        'width',
+        'height',
         'snapshot_extension',
         'snapshot_frequency',
         'snapshot_duration',
@@ -42,7 +42,6 @@ class CameraInline(admin.TabularInline):
 class LightInline(admin.TabularInline):
     model = Light
     extra = 1
-
     fields = (
         'gpio_export_num',
         'is_active',
@@ -54,7 +53,6 @@ class LightInline(admin.TabularInline):
 class PopToPumpDurationInline(admin.TabularInline):
     model = PopToPumpDuration
     extra = 1
-
     fields = (
         'pop',
         'duration',
@@ -65,14 +63,12 @@ class RunInline(admin.TabularInline):
     model = Run
     can_delete = False
     extra = 0
-
     fields = (
         'id',
         'pump',
         'start_time',
         'end_time',
     )
-
     readonly_fields = fields
 
     def has_add_permission(self, *args, **kwargs):
@@ -139,6 +135,9 @@ class ScheduledRunAdmin(admin.ModelAdmin):
         'start_time',
         'duration',
     )
+    readonly_fields = (
+        'weather_forecast',
+    )
     inlines = (
         RunInline,
     )
@@ -160,6 +159,8 @@ class CameraAdmin(admin.ModelAdmin):
         'device',
         'is_active',
         'index',
+        'width',
+        'height',
         'snapshot_extension',
         'snapshot_frequency',
         'snapshot_duration',

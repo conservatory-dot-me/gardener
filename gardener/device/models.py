@@ -492,6 +492,8 @@ class Camera(models.Model):
     is_active = models.BooleanField(default=True)
 
     index = models.PositiveSmallIntegerField(default=0, help_text='Camera index passed to cv2.')
+    width = models.PositiveSmallIntegerField(default=1280, help_text='Camera frame width passed to cv2.')
+    height = models.PositiveSmallIntegerField(default=960, help_text='Camera frame height passed to cv2.')
 
     snapshot_extension = models.CharField(max_length=3, default='jpg')
     snapshot_frequency = models.PositiveIntegerField(default=3600, help_text='In seconds.')

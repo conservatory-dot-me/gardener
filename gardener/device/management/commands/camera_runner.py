@@ -41,6 +41,9 @@ def capture(camera):
         return
     logger.info('opened cap')
 
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, camera.frame_width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, camera.frame_height)
+
     snapshot_number = camera.current_snapshot + 1
     if snapshot_number > camera.max_snapshots:
         snapshot_number = 1
@@ -52,7 +55,7 @@ def capture(camera):
 
     fourcc = cv2.VideoWriter_fourcc(*'MJPG')
     fps = 24
-    frame_size = (int(cap.get(3)), int(cap.get(4)))
+    frame_size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
     video_out = None
     if camera.snapshot_duration > 0:
         video_out = cv2.VideoWriter(output_path, fourcc, fps, frame_size)

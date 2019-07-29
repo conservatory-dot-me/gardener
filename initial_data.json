@@ -89,6 +89,8 @@
         "device": 1,
         "is_active": true,
         "index": 0,
+        "width": 1280,
+        "height": 960,
         "snapshot_extension": "jpg",
         "snapshot_frequency": 3600,
         "snapshot_duration": 0,

@@ -41,8 +41,8 @@ def capture(camera):
         return
     logger.info('opened cap')
 
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, camera.frame_width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, camera.frame_height)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, camera.width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, camera.height)
 
     snapshot_number = camera.current_snapshot + 1
     if snapshot_number > camera.max_snapshots:

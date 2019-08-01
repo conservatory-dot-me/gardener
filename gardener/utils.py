@@ -152,10 +152,10 @@ def get_next_sun(lat, lon, date=None):
     loc.pressure = 0
 
     dt = loc.next_rising(ephem.Sun(), use_center=False).datetime()
-    next_sunrise = timezone.make_aware(dt, pytz.timezone('UTC'))
+    next_sunrise = timezone.make_aware(dt, pytz.timezone('UTC')).replace(microsecond=0)  # Second precision.
 
     dt = loc.next_setting(ephem.Sun(), use_center=False).datetime()
-    next_sunset = timezone.make_aware(dt, pytz.timezone('UTC'))
+    next_sunset = timezone.make_aware(dt, pytz.timezone('UTC')).replace(microsecond=0)  # Second precision.
 
     logger.debug(
         f'lat={lat} - lon={lon} - date={date} - '

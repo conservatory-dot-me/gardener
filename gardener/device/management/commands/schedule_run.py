@@ -53,11 +53,15 @@ class Command(BaseCommand):
                 last_start_time = last_start_time.replace(minute=0, second=0, microsecond=0)  # Hourly precision.
 
                 if freq in (Pump.DAILY, Pump.WEEKLY, Pump.MONTHLY):
-                    next_sunrise, next_sunset = get_next_sun(
-                        pump.device.latitude,
-                        pump.device.longitude,
-                        date=last_start_time + timedelta(days=freq - 1))
-                    next_start_time = next_sunrise
+                    while True:
+                        next_start_time, _ = get_next_sun(
+                            pump.device.latitude,
+                            pump.device.longitude,
+                            date=last_start_time + timedelta(days=freq - 1))
+                        if next_start_time <= timezone.now():
+                            last_start_time += timedelta(days=1)
+                        else:
+                            break
                 else:
                     while True:
                         next_start_time = last_start_time + timedelta(seconds=freq * 86400)

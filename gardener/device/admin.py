@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from gardener.device.models import Camera
 from gardener.device.models import Device
+from gardener.device.models import Fan
 from gardener.device.models import Lcd
 from gardener.device.models import Light
 from gardener.device.models import PopToPumpDuration
@@ -50,6 +51,17 @@ class LightInline(admin.TabularInline):
     )
 
 
+class FanInline(admin.TabularInline):
+    model = Fan
+    extra = 1
+    fields = (
+        'gpio_export_num',
+        'is_active',
+        'start_time',
+        'duration',
+    )
+
+
 class PopToPumpDurationInline(admin.TabularInline):
     model = PopToPumpDuration
     extra = 1
@@ -87,6 +99,7 @@ class DeviceAdmin(admin.ModelAdmin):
         PumpInline,
         CameraInline,
         LightInline,
+        FanInline,
     )
 
 
@@ -179,11 +192,22 @@ class LightAdmin(admin.ModelAdmin):
     )
 
 
+class FanAdmin(admin.ModelAdmin):
+    list_display = (
+        'device',
+        'gpio_export_num',
+        'is_active',
+        'start_time',
+        'duration',
+    )
+
+
+admin.site.register(Camera, CameraAdmin)
 admin.site.register(Device, DeviceAdmin)
+admin.site.register(Fan, FanAdmin)
+admin.site.register(Lcd, LcdAdmin)
+admin.site.register(Light, LightAdmin)
 admin.site.register(PopToPumpDuration, PopToPumpDurationAdmin)
 admin.site.register(Pump, PumpAdmin)
 admin.site.register(Run, RunAdmin)
 admin.site.register(ScheduledRun, ScheduledRunAdmin)
-admin.site.register(Lcd, LcdAdmin)
-admin.site.register(Camera, CameraAdmin)
-admin.site.register(Light, LightAdmin)

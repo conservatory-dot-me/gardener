@@ -39,7 +39,7 @@
         "gpio_export_num": 229,
         "is_active": true,
         "max_duration": 600,
-        "scheduled_run_default_duration": 2.0,
+        "scheduled_run_default_duration": 3.0,
         "scheduled_run_frequency": 0.125
     }
 },
@@ -49,7 +49,7 @@
     "fields": {
         "pump": 1,
         "pop": 90,
-        "duration": 2.0
+        "duration": 3.0
     }
 },
 {
@@ -58,7 +58,7 @@
     "fields": {
         "pump": 1,
         "pop": 60,
-        "duration": 2.0
+        "duration": 3.0
     }
 },
 {
@@ -67,7 +67,7 @@
     "fields": {
         "pump": 1,
         "pop": 30,
-        "duration": 2.0
+        "duration": 3.0
     }
 },
 {
@@ -108,6 +108,18 @@
         "is_active": true,
         "start_time": "06:00:00",
         "duration": 43200.0
+    }
+},
+{
+    "model": "device.fan",
+    "pk": 1,
+    "fields": {
+        "relay_type": 0,
+        "device": 1,
+        "gpio_export_num": 235,
+        "is_active": true,
+        "start_time": "08:00:00",
+        "duration": 28800.0
     }
 }
 ]

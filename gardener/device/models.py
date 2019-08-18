@@ -228,6 +228,16 @@ class Gpio(models.Model):
             else:
                 logger.warning(f'path does not exist - gpio_edge_path={gpio_edge_path}')
 
+    def start(self):
+        if self.gpio_value(self.gpio_export_num) != self.ON:
+            logger.info(f'starting {self}')
+            self.set_gpio_value(self.gpio_export_num, self.ON)
+
+    def stop(self):
+        if self.gpio_value(self.gpio_export_num) != self.OFF:
+            logger.info(f'stopping {self}')
+            self.set_gpio_value(self.gpio_export_num, self.OFF)
+
 
 class Pump(Gpio):
     MAX_DURATION = 600
@@ -526,12 +536,16 @@ class Light(Gpio):
     def __repr__(self):
         return str(self)
 
-    def start(self):
-        if self.gpio_value(self.gpio_export_num) != self.ON:
-            logger.info(f'starting light={self}')
-            self.set_gpio_value(self.gpio_export_num, self.ON)
 
-    def stop(self):
-        if self.gpio_value(self.gpio_export_num) != self.OFF:
-            logger.info(f'stopping light={self}')
-            self.set_gpio_value(self.gpio_export_num, self.OFF)
+class Fan(Gpio):
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    gpio_export_num = models.PositiveSmallIntegerField(help_text='GPIO export number connected to this fan.')
+    is_active = models.BooleanField(default=True)
+    start_time = models.TimeField()
+    duration = models.FloatField(help_text='Runtime duration in seconds.')
+
+    def __str__(self):
+        return '<%s device=%s gpio_export_num=%d>' % (self.__class__.__name__, self.device, self.gpio_export_num)
+
+    def __repr__(self):
+        return str(self)

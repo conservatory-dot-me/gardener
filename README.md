@@ -22,6 +22,8 @@ work. If not, see <http://creativecommons.org/licenses/by-nc/4.0/>.
 
 - Automatic daily lighting schedule with adjustable duration.
 
+- Automatic daily ventilation schedule with adjustable duration.
+
 - Optionally receive an email notification when scheduled watering is started.
 
 - Manually start or stop water pump from web-based user interface or tactile switches on device.
@@ -54,6 +56,7 @@ exit
 ```
 ./run.sh
 ```
+
 ### Running project tests
 
 ```
@@ -259,5 +262,10 @@ The following GPIO pins on ODROID-C2 are selected for the default configuration.
     - Export GPIO# 230
     - WiringPI #14
     - 16x2 LCD pin P5 SCLK
+
+- Fan
+    - Export GPIO# 235
+    - WiringPi #12
+    - 16x2 LCD pin P5 MOSI
 
 See the "Django project setup" section above to complete the setup.

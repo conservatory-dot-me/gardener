@@ -15,6 +15,7 @@ from gardener.data.models import Location
 from gardener.data.models import WeatherForecast
 from gardener.data.models import WeatherForecastProvider
 from gardener.device.models import Device
+from gardener.device.models import Fan
 from gardener.device.models import Light
 from gardener.device.models import PopToPumpDuration
 from gardener.device.models import Pump
@@ -61,6 +62,18 @@ class DeviceTestCase(TransactionTestCase):
             duration=43200)
 
         self.light_2 = Light.objects.create(
+            device=self.device,
+            gpio_export_num=4,
+            start_time=time(10, 30),
+            duration=43200)
+
+        self.fan_1 = Fan.objects.create(
+            device=self.device,
+            gpio_export_num=3,
+            start_time=time(15, 0),
+            duration=43200)
+
+        self.fan_2 = Fan.objects.create(
             device=self.device,
             gpio_export_num=4,
             start_time=time(10, 30),
@@ -205,3 +218,27 @@ class DeviceTestCase(TransactionTestCase):
         # now 10:28 => stop
         call_command('light_runner', run_once=True)
         mock_set_gpio_value.assert_called_with(self.light_2.gpio_export_num, Light.OFF)
+
+    @mock.patch.object(Fan, 'set_gpio_value')
+    @mock.patch.object(Fan, 'gpio_value', return_value=Fan.OFF)
+    @mock.patch.object(
+        timezone,
+        'now',
+        return_value=datetime.strptime('2018-09-08T02:32:05+1000', '%Y-%m-%dT%H:%M:%S%z'))
+    def test_fan_runner_1(self, mock_timezone_now, mock_gpio_value, mock_set_gpio_value, *args):
+        # 15:00 -> 03:00
+        # now 02:32 => start
+        call_command('fan_runner', run_once=True)
+        mock_set_gpio_value.assert_called_with(self.fan_1.gpio_export_num, Fan.ON)
+
+    @mock.patch.object(Fan, 'set_gpio_value')
+    @mock.patch.object(Fan, 'gpio_value', return_value=Fan.ON)
+    @mock.patch.object(
+        timezone,
+        'now',
+        return_value=datetime.strptime('2018-09-08T10:28:05+1000', '%Y-%m-%dT%H:%M:%S%z'))
+    def test_fan_runner_2(self, mock_timezone_now, mock_gpio_value, mock_set_gpio_value, *args):
+        # 10:30 -> 22:30
+        # now 10:28 => stop
+        call_command('fan_runner', run_once=True)
+        mock_set_gpio_value.assert_called_with(self.fan_2.gpio_export_num, Fan.OFF)
